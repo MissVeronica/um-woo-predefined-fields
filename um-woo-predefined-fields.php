@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         1.0.0 development
+ * Version:         1.1.0 development
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -47,6 +47,13 @@ class UM_WOO_Predefined_Fields {
                             'public'   => 1,
                             'editable' => 1,
             );
+
+            if ( strpos( $woo_meta_key, 'country' )) {
+
+                $predefined_fields[$woo_meta_key]['type']        = 'select';
+                $predefined_fields[$woo_meta_key]['placeholder'] = __('Choose a Country','ultimate-member');
+                $predefined_fields[$woo_meta_key]['options']     =  UM()->builtin()->get( 'countries' );
+            }
         }
 
         return $predefined_fields;
