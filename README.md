@@ -9,6 +9,6 @@ Use the "Say What?" plugin with text domain ultimate-member.
 2. Text domain: ultimate-member
 3. Replacement string: Shipping Mobile Phone Number
 ## Updates
-None
+Version 1.1.0 Country dropdown
 ## Installation
 Download the zip file and install as a WP Plugin, activate the plugin.
