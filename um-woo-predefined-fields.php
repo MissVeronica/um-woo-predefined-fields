@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         1.1.0 development
+ * Version:         1.2.0 development
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -18,8 +18,8 @@ if ( ! class_exists( 'UM' ) ) return;
 
 class UM_WOO_Predefined_Fields {
 
-    public $woo_meta_keys = array(  'billing_postcode', 'billing_city', 'billing_address_1', 'billing_address_2', 'billing_state', 'billing_country', 
-                                    'shipping_postcode', 'shipping_city', 'shipping_address_1', 'shipping_address_2', 'shipping_state', 'shipping_country', 
+    public $woo_meta_keys = array(  'billing_postcode', 'billing_city', 'billing_address_1', 'billing_address_2', //'billing_state', 'billing_country', 
+                                    'shipping_postcode', 'shipping_city', 'shipping_address_1', 'shipping_address_2', //'shipping_state', 'shipping_country', 
                                     'paying_customer', 'billing_first_name', 'billing_last_name', 'billing_company', 'billing_phone', 'billing_email', 
                                     'shipping_first_name', 'shipping_last_name', 'shipping_company', 'shipping_phone' );
 
@@ -28,7 +28,6 @@ class UM_WOO_Predefined_Fields {
         add_filter( 'um_predefined_fields_hook',     array( $this, 'custom_predefined_fields_hook_woo' ), 10, 1 );
         add_filter( 'um_account_tab_general_fields', array( $this, 'um_account_predefined_fields_woo' ), 10, 2 );
         add_filter( 'um_settings_structure',         array( $this, 'um_settings_structure_predefined_fields_woo' ), 10, 1 );
-
     }
 
     public function custom_predefined_fields_hook_woo( $predefined_fields ) {      
@@ -47,13 +46,6 @@ class UM_WOO_Predefined_Fields {
                             'public'   => 1,
                             'editable' => 1,
             );
-
-            if ( strpos( $woo_meta_key, 'country' )) {
-
-                $predefined_fields[$woo_meta_key]['type']        = 'select';
-                $predefined_fields[$woo_meta_key]['placeholder'] = __('Choose a Country','ultimate-member');
-                $predefined_fields[$woo_meta_key]['options']     =  UM()->builtin()->get( 'countries' );
-            }
         }
 
         return $predefined_fields;
@@ -93,3 +85,31 @@ class UM_WOO_Predefined_Fields {
 }
 
 new UM_WOO_Predefined_Fields();
+
+function um_get_field_woo_countries_dropdown() {
+
+    global $woocommerce;
+
+    $countries = new WC_Countries();
+
+    return $countries->__get( 'countries' );
+}
+
+function um_get_field_woo_states_dropdown( $has_parent = false ) {
+
+    global $woocommerce;
+
+    $states = array();
+    if ( isset( $_POST['parent_option'] )) {
+
+        $country_code = sanitize_text_field( $_POST['parent_option'] );      
+
+        if ( ! empty( $country_code )) {
+
+            $countries = new WC_Countries();
+            $states = $countries->get_states( $country_code );
+        }
+    }
+
+    return $states;
+}
