@@ -101,7 +101,7 @@ function um_get_field_woo_states_dropdown( $has_parent = false ) {
 
     $states = array();
 
-    if ( class_exists( 'WC' ) && ! empty( $_POST['parent_option'] ) && is_string( $_POST['parent_option'] ) ) {
+    if ( class_exists( 'WC' ) && isset( $_POST['parent_option'] ) && is_string( $_POST['parent_option'] ) ) {
 		$country_code = sanitize_text_field( $_POST['parent_option'] );
 		$states = WC()->countries->get_states( $country_code );
 	}
