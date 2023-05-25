@@ -19,7 +19,7 @@ Country and State dropdowns with Woo sources and excluded from UM predefined fie
 2. Choices Callback for the State meta_keys (billing_state, shipping_state) is um_get_field_woo_states_dropdown and select your Woo Country title as "Parent Option" for the state.
 3.  Country and State dropdowns can not be edited in the User Account page.
 
-### Version 1.2.0
+### Version 1.3.0
 PHP code improvements
 
 ## Installation
