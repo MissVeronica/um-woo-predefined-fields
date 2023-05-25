@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         1.2.0 development
+ * Version:         1.3.0 development
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -32,9 +32,9 @@ class UM_WOO_Predefined_Fields {
 
     public function custom_predefined_fields_hook_woo( $predefined_fields ) {      
 
-        foreach( $this->woo_meta_keys as $woo_meta_key ) {
+        foreach ( $this->woo_meta_keys as $woo_meta_key ) {
 
-            $title = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key )), 'ultimate-member' );
+            $title = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
 
             $predefined_fields[$woo_meta_key] = array(
                 
@@ -55,7 +55,7 @@ class UM_WOO_Predefined_Fields {
 
         $options = UM()->options()->get( 'um_custom_predefined_fields_woo' );
 
-        if( ! empty( $options ) && is_array( $options )) {
+        if ( ! empty( $options ) && is_array( $options ) ) {
             $args .= ',' . implode( ',', $options );
             $args = str_replace( ',single_user_password', '', $args ) . ',single_user_password';
         }
@@ -67,8 +67,8 @@ class UM_WOO_Predefined_Fields {
 
         $options = array();
 
-        foreach( $this->woo_meta_keys as $woo_meta_key ) {
-            $options[$woo_meta_key] = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key )), 'ultimate-member' );
+        foreach ( $this->woo_meta_keys as $woo_meta_key ) {
+            $options[$woo_meta_key] = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
         }
 
         $settings_structure['']['sections']['account']['fields'][] = array(
@@ -88,28 +88,23 @@ new UM_WOO_Predefined_Fields();
 
 function um_get_field_woo_countries_dropdown() {
 
-    global $woocommerce;
+    $countries = array();
 
-    $countries = new WC_Countries();
+    if ( class_exists( 'WC' )) {
+        $countries = WC()->countries->get_countries();
+    }
 
-    return $countries->__get( 'countries' );
+    return $countries;
 }
 
 function um_get_field_woo_states_dropdown( $has_parent = false ) {
 
-    global $woocommerce;
-
     $states = array();
-    if ( isset( $_POST['parent_option'] )) {
 
-        $country_code = sanitize_text_field( $_POST['parent_option'] );      
-
-        if ( ! empty( $country_code )) {
-
-            $countries = new WC_Countries();
-            $states = $countries->get_states( $country_code );
-        }
-    }
+    if ( class_exists( 'WC' ) && ! empty( $_POST['parent_option'] ) && is_string( $_POST['parent_option'] ) ) {
+		$country_code = sanitize_text_field( $_POST['parent_option'] );
+		$states = WC()->countries->get_states( $country_code );
+	}
 
     return $states;
 }
