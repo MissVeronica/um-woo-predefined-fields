@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         2.0.0
+ * Version:         2.1.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -36,6 +36,7 @@ class UM_WOO_Predefined_Fields {
         add_filter( 'um_predefined_fields_hook',     array( $this, 'custom_predefined_fields_hook_woo' ), 10, 1 );
         add_filter( 'um_account_tab_general_fields', array( $this, 'um_account_predefined_fields_woo' ), 10, 2 );
         add_filter( 'um_settings_structure',         array( $this, 'um_settings_structure_predefined_fields_woo' ), 10, 1 );
+        add_filter( 'um_submitted_data_value',       array( $this, 'um_submitted_data_value_woo' ), 10, 4 );
         add_filter( 'um_get_form_fields',            array( $this, 'um_get_form_fields_woo' ), 9999, 2 );
         add_filter( 'um_user_edit_profile_fields',   array( $this, 'um_user_edit_profile_fields_woo' ), 10, 3 );
 
