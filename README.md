@@ -19,5 +19,8 @@ Use the "Say What?" plugin with text domain ultimate-member.
 ### Version 2.1.0
 1. Code improvement for WP User Info modal with UM submitted Info display.
 
+### Version 2.2.0
+1. Code improvements
+
 ## Installation
 Download the zip file and install as a WP Plugin, activate the plugin.
