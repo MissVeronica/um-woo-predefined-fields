@@ -15,7 +15,7 @@ Use the "Say What?" plugin with text domain ultimate-member.
 ## Updates
 ### Version 2.0.0
 1. Country and State dropdowns with Registration and Profile forms but not with the User Account page.
-2. Selection of country subset.
+2. Selection of Country subset.
 
 ### Version 2.1.0
 1. Code improvement for WP User Info modal with UM submitted Info display.
