@@ -23,5 +23,5 @@ Use the "Say What?" plugin with text domain ultimate-member.
 ### Version 2.3.0
 1. Single country will not require a select field for the country at Registration/Profile pages and State can be edited in the Account page
 
-## Installation
+## Installation and Updates
 Download the zip file and install as a WP Plugin, activate the plugin.
