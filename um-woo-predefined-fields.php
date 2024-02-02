@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         2.3.0
+ * Version:         2.3.1
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -15,6 +15,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 if ( ! class_exists( 'UM' ) ) return;
+if ( ! class_exists( 'WC' ) ) return;
 
 class UM_WOO_Predefined_Fields {
 
