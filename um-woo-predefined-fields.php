@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         2.3.1
+ * Version:         2.3.2
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -16,6 +16,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 if ( ! class_exists( 'UM' ) ) return;
 if ( ! class_exists( 'WC' ) ) return;
+
 
 class UM_WOO_Predefined_Fields {
 
@@ -303,52 +304,62 @@ new UM_WOO_Predefined_Fields();
 
     function um_get_field_woo_countries_dropdown() {
 
-        $countries_woo = WC()->countries->get_allowed_countries();
+        if ( UM()->dependencies()->woocommerce_active_check() ) {
 
-        $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
-        $countries = $countries_woo;
+            $countries_woo = WC()->countries->get_allowed_countries();
 
-        if ( ! empty( $country_selection )) {
+            $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
+            $countries = $countries_woo;
 
-            $countries = array();
-            foreach( $countries_woo as $key => $country ) {
-                if ( in_array( $key, $country_selection )) {
-                    $countries[$key] = $country;
+            if ( ! empty( $country_selection )) {
+
+                $countries = array();
+                foreach( $countries_woo as $key => $country ) {
+                    if ( in_array( $key, $country_selection )) {
+                        $countries[$key] = $country;
+                    }
                 }
             }
+
+            return $countries;
         }
 
-        return $countries;
+        return array( 'woo not active' );
     }
 
     function um_get_field_woo_states_dropdown( $options = false ) {
 
-        $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
+        if ( UM()->dependencies()->woocommerce_active_check() ) {
+       
+            $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
-        if ( count( $country_selection ) == 1 ) {
-            $country = sanitize_text_field( $country_selection[0] );
-            $states = WC()->countries->get_states( $country );
+            if ( count( $country_selection ) == 1 ) {
+                $country = sanitize_text_field( $country_selection[0] );
+                $states = WC()->countries->get_states( $country );
 
-            return $states;
-        }
+                return $states;
+            }
 
-        if ( is_array( $options )) {
+            if ( is_array( $options )) {
 
-            return $options;
-        }
+                return $options;
+            }
 
-        if (( isset( $_POST['parent_option_name'] ) && in_array( $_POST['parent_option_name'], array( 'billing_country', 'shipping_country' )))
-                ||
-            ( isset( $_POST['action'] ) && $_POST['action'] === 'um_select_options' )) {
+            if (( isset( $_POST['parent_option_name'] ) && in_array( $_POST['parent_option_name'], array( 'billing_country', 'shipping_country' )))
+                    ||
+                ( isset( $_POST['action'] ) && $_POST['action'] === 'um_select_options' )) {
 
-            if ( isset( $_POST['parent_option'] ) && ! empty( $_POST['parent_option'] ) ) {
+                if ( isset( $_POST['parent_option'] ) && ! empty( $_POST['parent_option'] ) ) {
 
-                $country = sanitize_text_field( $_POST['parent_option'] );
+                    $country = sanitize_text_field( $_POST['parent_option'] );
 
-                if( in_array( $country, $country_selection )) {
-                    $states = WC()->countries->get_states( $country );
-                    return $states;
+                    if( in_array( $country, $country_selection )) {
+                        $states = WC()->countries->get_states( $country );
+                        return $states;
+                    }
                 }
             }
         }
+
+        return array( 'woo not active' );
     }
