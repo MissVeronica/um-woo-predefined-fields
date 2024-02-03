@@ -15,7 +15,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 if ( ! class_exists( 'UM' ) ) return;
-if ( ! class_exists( 'WC' ) ) return;
+//if ( ! class_exists( 'WC' ) ) return;
 
 
 class UM_WOO_Predefined_Fields {
