@@ -3,7 +3,7 @@ Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and Us
 
 ## UM Settings -> General -> Account
 1. Predefined Fields Woo - Account Form Fields for User Edit - Select single or multiple Woo Fields for User Account Page Edit.
-2. Predefined Fields Woo - Countries for User selection - Select single or multiple Woo Countries for User selection. No selection use all available countries.
+2. Predefined Fields Woo - Countries for User selection - Select single or multiple Woo Countries for User selection.
 3. Note! Single country will not require a select field for the country at Registration/Profile pages and State can be edited in the Account page
 
 ## Translations or Text changes
