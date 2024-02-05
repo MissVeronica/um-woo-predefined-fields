@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         2.3.2
+ * Version:         2.3.4
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -15,8 +15,6 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 if ( ! class_exists( 'UM' ) ) return;
-//if ( ! class_exists( 'WC' ) ) return;
-
 
 class UM_WOO_Predefined_Fields {
 
@@ -55,7 +53,7 @@ class UM_WOO_Predefined_Fields {
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
-        if ( count( $country_selection ) == 1 ) {
+        if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
 
             if ( isset( $args['billing_state'] )) {
                 $country = sanitize_meta( 'billing_country', $country_selection[0], 'user' );
@@ -72,11 +70,11 @@ class UM_WOO_Predefined_Fields {
     public function um_user_edit_profile_fields_woo( $fields, $args, $form_data ) {
 
         if ( isset( $fields['billing_state'] ) && isset( $args['billing_country'] ) && ! empty( $args['billing_country'] )) {
-            $fields['billing_state']['options'] = WC()->countries->get_states( $args['billing_country'] );
+            $fields['billing_state']['options'] = $this->get_woo_states( $args['billing_country'] );
         }
 
         if ( isset( $fields['shipping_state'] )) {
-            $fields['shipping_state']['options'] = WC()->countries->get_states( $args['shipping_country'] );
+            $fields['shipping_state']['options'] = $this->get_woo_states( $args['shipping_country'] );
         }
 
         return $fields;
@@ -91,23 +89,23 @@ class UM_WOO_Predefined_Fields {
 
             if ( array_key_exists( 'billing_state', $form_fields )) {
 
-                if ( count( $country_selection ) != 1 ) {
+                if ( is_array( $country_selection ) && count( $country_selection ) != 1 ) {
                     $form_fields['billing_state']['parent_dropdown_relationship'] = 'billing_country';
                 }
 
                 if ( ! empty( um_user( 'billing_country' ) )) {
-                    $form_fields['billing_state']['options'] = WC()->countries->get_states( um_user( 'billing_country' ) );
+                    $form_fields['billing_state']['options'] = $this->get_woo_states( um_user( 'billing_country' ) );
                 }
             }
 
             if ( array_key_exists( 'shipping_state', $form_fields )) {
 
-                if ( count( $country_selection ) != 1 ) {
+                if ( is_array( $country_selection ) && count( $country_selection ) != 1 ) {
                     $form_fields['shipping_state']['parent_dropdown_relationship'] = 'shipping_country';
                 }
 
                 if ( ! empty( um_user( 'shipping_country' ) )) {
-                    $form_fields['shipping_state']['options'] = WC()->countries->get_states( um_user( 'shipping_country' ) );
+                    $form_fields['shipping_state']['options'] = $this->get_woo_states( um_user( 'shipping_country' ) );
                 }
             }
         }
@@ -128,22 +126,22 @@ class UM_WOO_Predefined_Fields {
 
         switch( $key ) {
 
-            case 'billing_country': $countries_woo = WC()->countries->get_allowed_countries();
+            case 'billing_country': $countries_woo = $this->get_woo_countries();
                                     $value = isset( $countries_woo[$value] ) ? $countries_woo[$value] : $value;
                                     break;
 
             case 'billing_state':  if ( ! empty( um_user( 'billing_country' ) )) {
-                                        $states = WC()->countries->get_states( um_user( 'billing_country' ) );
+                                        $states = $this->get_woo_states( um_user( 'billing_country' ) );
                                         $value = isset( $states[$value] ) ? $states[$value] : $value;
                                     }
                                     break;
 
-            case 'shipping_country':$countries_woo = WC()->countries->get_allowed_countries();
+            case 'shipping_country':$countries_woo = $this->get_woo_countries();
                                     $value = isset( $countries_woo[$value] ) ? $countries_woo[$value] : $value;
                                     break;
 
             case 'shipping_state':  if ( ! empty( um_user( 'shipping_country' ) )) {
-                                        $states = WC()->countries->get_states( um_user( 'shipping_country' ) );
+                                        $states = $this->get_woo_states( um_user( 'shipping_country' ) );
                                         $value = isset( $states[$value] ) ? $states[$value] : $value;
                                     }
                                     break;
@@ -155,7 +153,7 @@ class UM_WOO_Predefined_Fields {
     public function dropdown_options_parent_billing_state( $parent, $form ) {
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
-        if ( count( $country_selection ) == 1 ) {
+        if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
             return false;
         }
 
@@ -165,7 +163,7 @@ class UM_WOO_Predefined_Fields {
     public function dropdown_options_parent_shipping_state( $parent, $form ) {
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
-        if ( count( $country_selection ) == 1 ) {
+        if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
             return false;
         }
 
@@ -184,7 +182,7 @@ class UM_WOO_Predefined_Fields {
 
     public function get_field_woo_country( $array ) {
 
-        $countries_woo = WC()->countries->get_allowed_countries();
+        $countries_woo = $this->get_woo_countries();
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
         $array['options'] = $countries_woo;
@@ -224,7 +222,7 @@ class UM_WOO_Predefined_Fields {
 
             if ( in_array( $woo_meta_key, array( 'billing_country', 'shipping_country' ))) {
 
-                $options = WC()->countries->get_allowed_countries();
+                $options = $this->get_woo_countries();
                 $options_source = 'um_get_field_woo_countries_dropdown';
             }
 
@@ -272,7 +270,7 @@ class UM_WOO_Predefined_Fields {
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
-        if ( count( $country_selection ) == 1 ) {
+        if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
             $options['billing_state']  = __( 'Woo ' . ucwords( str_replace( '_', ' ', 'billing_state' ) ), 'ultimate-member' );
             $options['shipping_state'] = __( 'Woo ' . ucwords( str_replace( '_', ' ', 'shipping_state' ) ), 'ultimate-member' );
         }
@@ -290,7 +288,7 @@ class UM_WOO_Predefined_Fields {
                                 'id'      => 'um_custom_predefined_woo_countries',
                                 'type'    => 'select',
                                 'multi'   => true,
-                                'options' => WC()->countries->get_allowed_countries(),
+                                'options' => $this->get_woo_countries(),
                                 'label'   => __( 'Predefined Fields Woo - Countries for User selection', 'ultimate-member' ),
                                 'tooltip' => __( 'Select single or multiple Woo Countries for User selection. No selection use all available countries.', 'ultimate-member' )
                             );
@@ -298,6 +296,25 @@ class UM_WOO_Predefined_Fields {
         return $settings_structure;
     }
 
+    public function get_woo_countries() {
+
+        $countries = array( __( 'Woo not active', 'ultimate-member' ));
+        if ( UM()->dependencies()->woocommerce_active_check() ) {
+            $countries = WC()->countries->get_allowed_countries();
+        }
+
+        return $countries;
+    }
+
+    public function get_woo_states( $country ) {
+    
+        $states = array( __( 'Woo not active', 'ultimate-member' ));
+        if ( UM()->dependencies()->woocommerce_active_check() ) {
+            $states = WC()->countries->get_states( $country );
+        }
+
+        return $states;
+    }
 }
 
 new UM_WOO_Predefined_Fields();
@@ -324,7 +341,7 @@ new UM_WOO_Predefined_Fields();
             return $countries;
         }
 
-        return array( 'woo not active' );
+        return array( __( 'Woo not active', 'ultimate-member' ) );
     }
 
     function um_get_field_woo_states_dropdown( $options = false ) {
@@ -333,7 +350,7 @@ new UM_WOO_Predefined_Fields();
        
             $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
-            if ( count( $country_selection ) == 1 ) {
+            if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
                 $country = sanitize_text_field( $country_selection[0] );
                 $states = WC()->countries->get_states( $country );
 
@@ -361,5 +378,5 @@ new UM_WOO_Predefined_Fields();
             }
         }
 
-        return array( 'woo not active' );
+        return array( __( 'Woo not active', 'ultimate-member' ) );
     }
