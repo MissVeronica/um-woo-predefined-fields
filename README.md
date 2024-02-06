@@ -23,9 +23,10 @@ Use the "Say What?" plugin with text domain ultimate-member.
 ### Version 2.3.0
 1. Single country will not require a select field for the country at Registration/Profile pages and State can be edited in the Account page
 
-### Version 2.3.1/2.3.2/2.3.4
+### Version 2.3.1/2.3.2/2.3.4/2.3.5
 1. Test if WooCommerce is activated to avoid PHP errors 
 2. Code improvements
+3. "All countries" requires selecting all with shift-include in dropdown at UM Settings -> General -> Account
 
 ## Installation and Updates
 Download the zip file and install as a WP Plugin, activate the plugin.
