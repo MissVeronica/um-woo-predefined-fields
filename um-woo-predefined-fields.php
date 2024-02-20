@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         2.3.5
+ * Version:         2.4.0 supports UM 2.8.3
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -10,7 +10,7 @@
  * Author URI:      https://github.com/MissVeronica
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.8.2
+ * UM version:      2.8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -275,22 +275,25 @@ class UM_WOO_Predefined_Fields {
             $options['shipping_state'] = __( 'Woo ' . ucwords( str_replace( '_', ' ', 'shipping_state' ) ), 'ultimate-member' );
         }
 
-        $settings_structure['']['sections']['account']['fields'][] = array(
-                                'id'      => 'um_custom_predefined_fields_woo',
-                                'type'    => 'select',
-                                'multi'   => true,
-                                'options' => $options,
-                                'label'   => __( 'Predefined Fields Woo - Account Form Fields for User Edit', 'ultimate-member' ),
-                                'tooltip' => __( 'Select single or multiple Woo Fields for User Account Page Edit.', 'ultimate-member' )
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title'] = 'Predefined Fields Woo';
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = 'Plugin version 2.4.0 - tested with UM 2.8.3';
+
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
+                                'id'          => 'um_custom_predefined_fields_woo',
+                                'type'        => 'select',
+                                'multi'       => true,
+                                'options'     => $options,
+                                'label'       => __( 'Account Form Fields for User Edit', 'ultimate-member' ),
+                                'description' => __( 'Select single or multiple Woo Fields for User Account Page Edit.', 'ultimate-member' )
                             );
 
-        $settings_structure['']['sections']['account']['fields'][] = array(
-                                'id'      => 'um_custom_predefined_woo_countries',
-                                'type'    => 'select',
-                                'multi'   => true,
-                                'options' => $this->get_woo_countries(),
-                                'label'   => __( 'Predefined Fields Woo - Countries for User selection', 'ultimate-member' ),
-                                'tooltip' => __( 'Select single or multiple Woo Countries for User selection.', 'ultimate-member' )
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
+                                'id'          => 'um_custom_predefined_woo_countries',
+                                'type'        => 'select',
+                                'multi'       => true,
+                                'options'     => $this->get_woo_countries(),
+                                'label'       => __( 'Countries for User selection', 'ultimate-member' ),
+                                'description' => __( 'Select single or multiple Woo Countries for User selection.', 'ultimate-member' )
                             );
 
         return $settings_structure;
@@ -339,9 +342,10 @@ new UM_WOO_Predefined_Fields();
             }
 
             return $countries;
-        }
 
-        return array( __( 'Woo not active', 'ultimate-member' ) );
+        } else {
+            return array( __( 'Woo not active', 'ultimate-member' ) );
+        }
     }
 
     function um_get_field_woo_states_dropdown( $options = false ) {
@@ -376,7 +380,8 @@ new UM_WOO_Predefined_Fields();
                     }
                 }
             }
-        }
 
-        return array( __( 'Woo not active', 'ultimate-member' ) );
+        } else {
+            return array( __( 'Woo not active', 'ultimate-member' ) );
+        }
     }
