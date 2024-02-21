@@ -275,8 +275,8 @@ class UM_WOO_Predefined_Fields {
             $options['shipping_state'] = __( 'Woo ' . ucwords( str_replace( '_', ' ', 'shipping_state' ) ), 'ultimate-member' );
         }
 
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title'] = 'Predefined Fields Woo';
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = 'Plugin version 2.4.0 - tested with UM 2.8.3';
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title']       = __( 'Predefined Fields Woo', 'ultimate-member' );
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = __( 'Plugin version 2.4.0 - tested with UM 2.8.3', 'ultimate-member' );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
                                 'id'          => 'um_custom_predefined_fields_woo',
