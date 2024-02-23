@@ -29,7 +29,7 @@ Use the "Say What?" plugin with text domain ultimate-member.
 3. "All countries" requires selecting all with shift-include in dropdown at UM Settings -> General -> Account
 
 ### Version 2.4.0
-1. Tested with UM 2.8.3
+1. Updated for UM 2.8.3
 
 ## Installation and Updates
 Download the zip file and install as a WP Plugin, activate the plugin.
