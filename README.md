@@ -32,4 +32,6 @@ Use the "Say What?" plugin with text domain ultimate-member.
 1. Updated for UM 2.8.3
 
 ## Installation and Updates
-Download the zip file and install as a WP Plugin, activate the plugin.
+1. Install and update by downloading the plugin ZIP file via the green "Code" button
+2. Install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
+3. Activate the Plugin: Ultimate Member - Woo Predefined Fields
