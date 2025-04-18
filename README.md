@@ -6,6 +6,30 @@ Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and Us
 2. Predefined Fields Woo - Countries for User selection - Select single or multiple Woo Countries for User selection.
 3. Note! Single country will not require a select field for the country at Registration/Profile pages and State can be edited in the Account page
 
+## Woo meta_keys as UM predefined fields
+* billing_address_1
+* billing_address_2
+* billing_city
+* billing_company
+* billing_country
+* billing_email
+* billing_first_name
+* billing_last_name
+* billing_phone
+* billing_postcode
+* billing_state
+* paying_customer
+* shipping_address_1
+* shipping_address_2
+* shipping_city
+* shipping_company
+* shipping_country
+* shipping_first_name
+* shipping_last_name
+* shipping_phone
+* shipping_postcode
+* shipping_state
+
 ## Translations or Text changes
 Use the "Say What?" plugin with text domain ultimate-member.
 1. Original string: Woo Shipping Phone
