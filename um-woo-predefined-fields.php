@@ -1,16 +1,18 @@
 <?php
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
- * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Designer and User edit at the Account Page.
- * Version:         2.4.0 supports UM 2.8.3
+ * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and User edit at the Account Page.
+ * Version:         2.5.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  * Author URI:      https://github.com/MissVeronica
+ * Plugin URI:      https://github.com/MissVeronica/um-woo-predefined-fields
+ * Update URI:      https://github.com/MissVeronica/um-woo-predefined-fields
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.8.3
+ * UM version:      2.10.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -33,6 +35,8 @@ class UM_WOO_Predefined_Fields {
 
     function __construct( ) {
 
+        define( 'Plugin_Basename_WPF', plugin_basename(__FILE__));
+
         add_filter( 'um_predefined_fields_hook',          array( $this, 'custom_predefined_fields_hook_woo' ), 10, 1 );
         add_filter( 'um_account_tab_general_fields',      array( $this, 'um_account_predefined_fields_woo' ), 10, 2 );
         add_filter( 'um_settings_structure',              array( $this, 'um_settings_structure_predefined_fields_woo' ), 10, 1 );
@@ -47,6 +51,16 @@ class UM_WOO_Predefined_Fields {
         add_filter( 'um_get_field__shipping_country',                     array( $this, 'get_field_woo_country' ), 10, 1 );
         add_filter( 'um_custom_dropdown_options_parent__billing_state',   array( $this, 'dropdown_options_parent_billing_state' ), 10, 2 );
         add_filter( 'um_custom_dropdown_options_parent__shipping_state',  array( $this, 'dropdown_options_parent_shipping_state' ), 10, 2 );
+
+        add_filter( 'plugin_action_links_' . Plugin_Basename_WPF,         array( $this, 'plugin_settings_link' ), 10 );
+    }
+
+    function plugin_settings_link( $links ) {
+
+        $url = get_admin_url() . 'admin.php?page=um_options&section=account';
+        $links[] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings' ) . '</a>';
+
+        return $links;
     }
 
     public function um_registration_set_woo_country( $user_id, $args, $form_data ) {
@@ -73,7 +87,7 @@ class UM_WOO_Predefined_Fields {
             $fields['billing_state']['options'] = $this->get_woo_states( $args['billing_country'] );
         }
 
-        if ( isset( $fields['shipping_state'] )) {
+        if ( isset( $fields['shipping_state'] ) && isset( $args['shipping_country'] ) && ! empty( $args['shipping_country'] )) {
             $fields['shipping_state']['options'] = $this->get_woo_states( $args['shipping_country'] );
         }
 
@@ -203,7 +217,7 @@ class UM_WOO_Predefined_Fields {
 
         foreach ( $this->woo_meta_keys as $woo_meta_key ) {
 
-            $title = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
+            $title = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
 
             $predefined_fields[$woo_meta_key] = array(
                                                     'title'    => $title,
@@ -218,7 +232,7 @@ class UM_WOO_Predefined_Fields {
 
         foreach ( $this->woo_meta_keys_select as $woo_meta_key ) {
 
-            $title = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
+            $title = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
 
             if ( in_array( $woo_meta_key, array( 'billing_country', 'shipping_country' ))) {
 
@@ -228,7 +242,7 @@ class UM_WOO_Predefined_Fields {
 
             if ( in_array( $woo_meta_key, array( 'billing_state', 'shipping_state' ))) {
 
-                $options = array( __( 'No states yet', 'ultimate-member' ));
+                $options = array( esc_html__( 'No states yet', 'ultimate-member' ));
                 $options_source = 'um_get_field_woo_states_dropdown';
             }
 
@@ -265,26 +279,26 @@ class UM_WOO_Predefined_Fields {
         $options = array();
 
         foreach ( $this->woo_meta_keys as $woo_meta_key ) {
-            $options[$woo_meta_key] = __( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
+            $options[$woo_meta_key] = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
         }
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
         if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
-            $options['billing_state']  = __( 'Woo ' . ucwords( str_replace( '_', ' ', 'billing_state' ) ), 'ultimate-member' );
-            $options['shipping_state'] = __( 'Woo ' . ucwords( str_replace( '_', ' ', 'shipping_state' ) ), 'ultimate-member' );
+            $options['billing_state']  = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', 'billing_state' ) ), 'ultimate-member' );
+            $options['shipping_state'] = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', 'shipping_state' ) ), 'ultimate-member' );
         }
 
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title']       = __( 'Predefined Fields Woo', 'ultimate-member' );
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = __( 'Plugin version 2.4.0 - tested with UM 2.8.3', 'ultimate-member' );
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title']       = esc_html__( 'Woo Predefined Fields', 'ultimate-member' );
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = esc_html__( 'Plugin version 2.5.0 - tested with UM 2.10.2', 'ultimate-member' );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
                                 'id'          => 'um_custom_predefined_fields_woo',
                                 'type'        => 'select',
                                 'multi'       => true,
                                 'options'     => $options,
-                                'label'       => __( 'Account Form Fields for User Edit', 'ultimate-member' ),
-                                'description' => __( 'Select single or multiple Woo Fields for User Account Page Edit.', 'ultimate-member' )
+                                'label'       => esc_html__( 'Account Form Fields for User Edit', 'ultimate-member' ),
+                                'description' => esc_html__( 'Select single or multiple Woo Fields for User Account Page Edit.', 'ultimate-member' )
                             );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
@@ -292,8 +306,8 @@ class UM_WOO_Predefined_Fields {
                                 'type'        => 'select',
                                 'multi'       => true,
                                 'options'     => $this->get_woo_countries(),
-                                'label'       => __( 'Countries for User selection', 'ultimate-member' ),
-                                'description' => __( 'Select single or multiple Woo Countries for User selection.', 'ultimate-member' )
+                                'label'       => esc_html__( 'Countries for User selection', 'ultimate-member' ),
+                                'description' => esc_html__( 'Select single or multiple Woo Countries for User selection.', 'ultimate-member' )
                             );
 
         return $settings_structure;
@@ -301,7 +315,7 @@ class UM_WOO_Predefined_Fields {
 
     public function get_woo_countries() {
 
-        $countries = array( __( 'Woo not active', 'ultimate-member' ));
+        $countries = array( esc_html__( 'Woo not active', 'ultimate-member' ));
         if ( UM()->dependencies()->woocommerce_active_check() ) {
             $countries = WC()->countries->get_allowed_countries();
         }
@@ -310,8 +324,8 @@ class UM_WOO_Predefined_Fields {
     }
 
     public function get_woo_states( $country ) {
-    
-        $states = array( __( 'Woo not active', 'ultimate-member' ));
+
+        $states = array( esc_html__( 'Woo not active', 'ultimate-member' ));
         if ( UM()->dependencies()->woocommerce_active_check() ) {
             $states = WC()->countries->get_states( $country );
         }
@@ -344,14 +358,14 @@ new UM_WOO_Predefined_Fields();
             return $countries;
 
         } else {
-            return array( __( 'Woo not active', 'ultimate-member' ) );
+            return array( esc_html__( 'Woo not active', 'ultimate-member' ) );
         }
     }
 
     function um_get_field_woo_states_dropdown( $options = false ) {
 
         if ( UM()->dependencies()->woocommerce_active_check() ) {
-       
+
             $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
             if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
@@ -382,6 +396,6 @@ new UM_WOO_Predefined_Fields();
             }
 
         } else {
-            return array( __( 'Woo not active', 'ultimate-member' ) );
+            return array( esc_html__( 'Woo not active', 'ultimate-member' ) );
         }
     }
