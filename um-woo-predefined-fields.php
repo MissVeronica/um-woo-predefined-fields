@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and User edit at the Account Page.
- * Version:         2.5.0
+ * Version:         2.5.1
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -12,7 +12,7 @@
  * Update URI:      https://github.com/MissVeronica/um-woo-predefined-fields
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.10.2
+ * UM version:      2.10.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -35,7 +35,7 @@ class UM_WOO_Predefined_Fields {
 
     function __construct( ) {
 
-        define( 'Plugin_Basename_WPF', plugin_basename(__FILE__));
+        define( 'Plugin_Basename__WPF', plugin_basename( __FILE__ ));
 
         add_filter( 'um_predefined_fields_hook',          array( $this, 'custom_predefined_fields_hook_woo' ), 10, 1 );
         add_filter( 'um_account_tab_general_fields',      array( $this, 'um_account_predefined_fields_woo' ), 10, 2 );
@@ -52,7 +52,7 @@ class UM_WOO_Predefined_Fields {
         add_filter( 'um_custom_dropdown_options_parent__billing_state',   array( $this, 'dropdown_options_parent_billing_state' ), 10, 2 );
         add_filter( 'um_custom_dropdown_options_parent__shipping_state',  array( $this, 'dropdown_options_parent_shipping_state' ), 10, 2 );
 
-        add_filter( 'plugin_action_links_' . Plugin_Basename_WPF,         array( $this, 'plugin_settings_link' ), 10 );
+        add_filter( 'plugin_action_links_' . Plugin_Basename__WPF,        array( $this, 'plugin_settings_link' ), 10, 1 );
     }
 
     function plugin_settings_link( $links ) {
@@ -290,7 +290,7 @@ class UM_WOO_Predefined_Fields {
         }
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title']       = esc_html__( 'Woo Predefined Fields', 'ultimate-member' );
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = esc_html__( 'Plugin version 2.5.0 - tested with UM 2.10.2', 'ultimate-member' );
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = esc_html__( 'Plugin version 2.5.1 - tested with UM 2.10.3', 'ultimate-member' );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
                                 'id'          => 'um_custom_predefined_fields_woo',
@@ -399,3 +399,4 @@ new UM_WOO_Predefined_Fields();
             return array( esc_html__( 'Woo not active', 'ultimate-member' ) );
         }
     }
+
