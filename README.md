@@ -58,6 +58,9 @@ Use the "Say What?" plugin with text domain ultimate-member.
 ### Version 2.5.0
 1. Code improvements
 
+### Version 2.5.1
+1. Code improvements
+
 ## Installation and Updates
 1. Install and update by downloading the plugin ZIP file via the green "Code" button
 2. Install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
