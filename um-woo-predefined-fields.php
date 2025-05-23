@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and User edit at the Account Page.
- * Version:         2.5.1
+ * Version:         2.5.2
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -290,7 +290,7 @@ class UM_WOO_Predefined_Fields {
         }
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title']       = esc_html__( 'Woo Predefined Fields', 'ultimate-member' );
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = esc_html__( 'Plugin version 2.5.1 - tested with UM 2.10.3', 'ultimate-member' );
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = esc_html__( 'Plugin version 2.5.2 - tested with UM 2.10.4', 'ultimate-member' );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
                                 'id'          => 'um_custom_predefined_fields_woo',
@@ -398,5 +398,7 @@ new UM_WOO_Predefined_Fields();
         } else {
             return array( esc_html__( 'Woo not active', 'ultimate-member' ) );
         }
+
+        return array();
     }
 
