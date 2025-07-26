@@ -36,6 +36,9 @@ Use the "Say What?" plugin with text domain ultimate-member.
 2. Text domain: ultimate-member
 3. Replacement string: Shipping Mobile Phone Number
 
+## References
+Woo Account Endpoints https://github.com/MissVeronica/um-woo-account-endpoints
+
 ## Updates
 ### Version 2.0.0
 1. Country and State dropdowns with Registration and Profile forms but not with the User Account page.
