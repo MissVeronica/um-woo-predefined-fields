@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Woo Predefined Fields
  * Description:     Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and User edit at the Account Page.
- * Version:         2.5.2
+ * Version:         2.6.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -12,7 +12,7 @@
  * Update URI:      https://github.com/MissVeronica/um-woo-predefined-fields
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.10.3
+ * UM version:      2.10.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -33,6 +33,17 @@ class UM_WOO_Predefined_Fields {
                                           'shipping_state',
                                         );
 
+    public $woo_directory_labels = false;
+    public $woo_labels           = false;
+    public $labels               = array();
+    public $titles               = array();
+    public $placeholders         = array();
+
+    public $woo_address_types    = array(   'billing_',
+                                            'shipping_',
+                                            'paying_',
+                                        );
+
     function __construct( ) {
 
         define( 'Plugin_Basename__WPF', plugin_basename( __FILE__ ));
@@ -51,6 +62,8 @@ class UM_WOO_Predefined_Fields {
         add_filter( 'um_get_field__shipping_country',                     array( $this, 'get_field_woo_country' ), 10, 1 );
         add_filter( 'um_custom_dropdown_options_parent__billing_state',   array( $this, 'dropdown_options_parent_billing_state' ), 10, 2 );
         add_filter( 'um_custom_dropdown_options_parent__shipping_state',  array( $this, 'dropdown_options_parent_shipping_state' ), 10, 2 );
+
+        add_filter( 'um_ajax_get_members_data',                           array( $this, 'um_ajax_get_members_profile_card_woo_labels' ), 10, 3 );
 
         add_filter( 'plugin_action_links_' . Plugin_Basename__WPF,        array( $this, 'plugin_settings_link' ), 10, 1 );
     }
@@ -202,8 +215,10 @@ class UM_WOO_Predefined_Fields {
         $array['options'] = $countries_woo;
 
         if ( ! empty( $country_selection )) {
+
             $array['options'] = array();
             foreach( $countries_woo as $key => $country ) {
+
                 if ( in_array( $key, $country_selection )) {
                     $array['options'][$key] = $country;
                 }
@@ -213,26 +228,117 @@ class UM_WOO_Predefined_Fields {
         return $array;
     }
 
+    public function get_woo_um_form_labels() {
+
+        if ( $this->woo_directory_labels === false ) {
+
+            $this->woo_directory_labels = array();
+
+            $um_forms     = get_posts( array( 'post_type' => 'um_form', 'numberposts' => -1, 'post_status' => array( 'publish' )));
+            $woo_metakeys = array_merge( $this->woo_meta_keys, $this->woo_meta_keys_select );
+
+            foreach ( $um_forms as $um_form ) {
+
+                $um_form_mode = get_post_meta( $um_form->ID, '_um_mode', true  );
+                if ( in_array( $um_form_mode, array( 'profile', 'register' ) )) {
+
+                    $form_fields = get_post_meta( $um_form->ID, '_um_custom_fields', true );
+                    foreach( $form_fields as $key => $form_field ) {
+
+                        if ( in_array( $key, $woo_metakeys )) {
+                            $this->woo_directory_labels[$key] = $form_field['label'];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function um_ajax_get_members_profile_card_woo_labels( $data_array, $user_id, $directory_data ) {
+
+        if ( UM()->options()->get( 'um_custom_predefined_woo_directory' ) == 1 ) {
+
+            $this->get_woo_um_form_labels();
+
+            if ( ! empty( $this->woo_directory_labels )) {
+
+                foreach( $this->woo_directory_labels as $metakey => $label ) {
+
+                    if ( isset( $data_array["label_{$metakey}"] )) {
+                        $data_array["label_{$metakey}"] = esc_html( $label );
+                    }
+                }
+            }
+        }
+
+        return $data_array;
+    }
+
+    public function get_woo_defined_labels() {
+
+        if ( $this->woo_labels === false ) {
+
+            $this->woo_labels = array();
+
+            if ( UM()->dependencies()->woocommerce_active_check() ) {
+
+                $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
+                $country = ( is_array( $country_selection ) && count( $country_selection ) == 1 ) ? $country_selection[0] : '';
+
+                foreach( $this->woo_address_types as $woo_address_type ) {
+                    $woo_fields = WC()->countries->get_address_fields( $country, $woo_address_type );
+
+                    foreach( $woo_fields as $woo_meta_key => $woo_field ) {
+
+                        if ( isset( $woo_field['label'] ) && ! empty( $woo_field['label'] )) {
+                            $this->woo_labels[$woo_meta_key]['label']       = esc_html( $woo_field['label'] );
+                            $this->woo_labels[$woo_meta_key]['placeholder'] = ( isset( $woo_field['placeholder'] ) && ! empty( $woo_field['placeholder'] )) ? esc_html( $woo_field['placeholder'] ) : '';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function get_titles_and_labels()  {
+
+        $this->get_woo_defined_labels();
+
+        if ( empty( $this->label )) {
+
+            foreach ( array_merge( $this->woo_meta_keys, $this->woo_meta_keys_select ) as $woo_meta_key ) {
+
+                $this->labels[$woo_meta_key] = ( isset( $this->woo_labels[$woo_meta_key]['label'] ) && ! empty( $this->woo_labels[$woo_meta_key]['label'] )) ? $this->woo_labels[$woo_meta_key]['label'] : esc_html( ucwords( str_replace( '_', ' ', $woo_meta_key )));
+                $this->labels[$woo_meta_key] = $this->labels[$woo_meta_key];
+
+                $this->titles[$woo_meta_key] = sprintf( esc_html__( 'Woo  %s', 'ultimate-member' ), $this->labels[$woo_meta_key] ) . ' - ' . $woo_meta_key;
+                $this->titles[$woo_meta_key] = $this->titles[$woo_meta_key];
+
+                $this->placeholders[$woo_meta_key] = ( isset( $this->woo_labels[$woo_meta_key]['placeholder'] ) && ! empty( $this->woo_labels[$woo_meta_key]['placeholder'] ) ? $this->woo_labels[$woo_meta_key]['placeholder'] : '' );
+            }
+        }
+    }
+
     public function custom_predefined_fields_hook_woo( $predefined_fields ) {
+
+        $this->get_titles_and_labels();
 
         foreach ( $this->woo_meta_keys as $woo_meta_key ) {
 
-            $title = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
-
             $predefined_fields[$woo_meta_key] = array(
-                                                    'title'    => $title,
-                                                    'metakey'  => $woo_meta_key,
-                                                    'type'     => 'text',
-                                                    'label'    => $title,
-                                                    'required' => 0,
-                                                    'public'   => 1,
-                                                    'editable' => true,
-                                                );
+                                                        'title'       => $this->titles[$woo_meta_key],
+                                                        'metakey'     => $woo_meta_key,
+                                                        'type'        => 'text',
+                                                        'label'       => $this->labels[$woo_meta_key],
+                                                        'placeholder' => $this->placeholders[$woo_meta_key],
+                                                        'required'    => 0,
+                                                        'public'      => 1,
+                                                        'editable'    => true,
+                                                    );
+
         }
 
         foreach ( $this->woo_meta_keys_select as $woo_meta_key ) {
-
-            $title = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
 
             if ( in_array( $woo_meta_key, array( 'billing_country', 'shipping_country' ))) {
 
@@ -247,16 +353,16 @@ class UM_WOO_Predefined_Fields {
             }
 
             $predefined_fields[$woo_meta_key] = array(
-                                                    'title'    => $title,
-                                                    'metakey'  => $woo_meta_key,
-                                                    'type'     => 'select',
-                                                    'label'    => $title,
-                                                    'required' => 0,
-                                                    'public'   => 1,
-                                                    'editable' => true,
-                                                    'options'  => $options,
-                                                    'custom_dropdown_options_source' => $options_source,
-                                                );
+                                                        'title'    => $this->titles[$woo_meta_key],
+                                                        'metakey'  => $woo_meta_key,
+                                                        'type'     => 'select',
+                                                        'label'    => $this->labels[$woo_meta_key],
+                                                        'required' => 0,
+                                                        'public'   => 1,
+                                                        'editable' => true,
+                                                        'options'  => $options,
+                                                        'custom_dropdown_options_source' => $options_source,
+                                                    );
         }
 
         return $predefined_fields;
@@ -264,41 +370,74 @@ class UM_WOO_Predefined_Fields {
 
     public function um_account_predefined_fields_woo( $args, $shortcode_args ) {
 
-        $options = UM()->options()->get( 'um_custom_predefined_fields_woo' );
+        $acoount_woo_options = UM()->options()->get( 'um_custom_predefined_fields_woo' );
 
-        if ( ! empty( $options ) && is_array( $options ) ) {
-            $args .= ',' . implode( ',', $options );
-            $args = str_replace( ',single_user_password', '', $args ) . ',single_user_password';
+        if ( is_array( $acoount_woo_options ) && ! empty( $acoount_woo_options )) {
+
+            $acoount_woo_options = array_map( 'sanitize_key', $acoount_woo_options );
+            $woo_metakeys = array_merge( $this->woo_meta_keys, $this->woo_meta_keys_select );
+
+            foreach( $acoount_woo_options as $key => $acoount_woo_option ) {
+                if ( ! in_array( $acoount_woo_option, $woo_metakeys )) {
+                    unset( $acoount_woo_options[$key] );
+                }
+            }
+
+            if ( ! empty( $acoount_woo_options ) ) {
+                $args .= ',' . implode( ',', $acoount_woo_options );
+                $args  = str_replace( ',single_user_password', '', $args ) . ',single_user_password';
+            }
         }
 
         return $args;
     }
 
+    public function get_possible_plugin_update( $plugin ) {
+
+        $plugin_data = get_plugin_data( __FILE__ );
+
+        $documention = sprintf( ' <a href="%s" target="_blank" title="%s">%s</a>',
+                                        esc_url( $plugin_data['PluginURI'] ),
+                                        esc_html__( 'GitHub plugin documentation and download', 'ultimate-member' ),
+                                        esc_html__( 'Documentation', 'ultimate-member' ));
+
+        $description = sprintf( esc_html__( 'Plugin "Woo Predefined Fields" version %s - Tested with UM 2.10.6 - %s', 'ultimate-member' ),
+                                                                            $plugin_data['Version'], $documention );
+        return $description;
+    }
+
     public function um_settings_structure_predefined_fields_woo( $settings_structure ) {
 
+// Possible performans improvement User select which metakeys to activate.
+
         $options = array();
+        $prefix  = '&nbsp; * &nbsp;';
+
+        $this->get_titles_and_labels();
 
         foreach ( $this->woo_meta_keys as $woo_meta_key ) {
-            $options[$woo_meta_key] = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', $woo_meta_key ) ), 'ultimate-member' );
+
+            $options[$woo_meta_key] = $this->titles[$woo_meta_key];
         }
 
         $country_selection = UM()->options()->get( 'um_custom_predefined_woo_countries' );
 
         if ( is_array( $country_selection ) && count( $country_selection ) == 1 ) {
-            $options['billing_state']  = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', 'billing_state' ) ), 'ultimate-member' );
-            $options['shipping_state'] = esc_html__( 'Woo ' . ucwords( str_replace( '_', ' ', 'shipping_state' ) ), 'ultimate-member' );
+
+            $options['billing_state']  = $this->titles['billing_state'];
+            $options['shipping_state'] = $this->titles['shipping_state'];
         }
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['title']       = esc_html__( 'Woo Predefined Fields', 'ultimate-member' );
-        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = esc_html__( 'Plugin version 2.5.2 - tested with UM 2.10.4', 'ultimate-member' );
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['description'] = $this->get_possible_plugin_update( 'um-woo-predefined-fields' );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
                                 'id'          => 'um_custom_predefined_fields_woo',
                                 'type'        => 'select',
                                 'multi'       => true,
                                 'options'     => $options,
-                                'label'       => esc_html__( 'Account Form Fields for User Edit', 'ultimate-member' ),
-                                'description' => esc_html__( 'Select single or multiple Woo Fields for User Account Page Edit.', 'ultimate-member' )
+                                'label'       => $prefix . esc_html__( 'Account Form Woo Fields for User Edit', 'ultimate-member' ),
+                                'description' => esc_html__( 'Select single or multiple Woo Fields (metakeys) for User Account Page Edit.', 'ultimate-member' )
                             );
 
         $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
@@ -306,8 +445,15 @@ class UM_WOO_Predefined_Fields {
                                 'type'        => 'select',
                                 'multi'       => true,
                                 'options'     => $this->get_woo_countries(),
-                                'label'       => esc_html__( 'Countries for User selection', 'ultimate-member' ),
+                                'label'       => $prefix . esc_html__( 'Countries for User selection', 'ultimate-member' ),
                                 'description' => esc_html__( 'Select single or multiple Woo Countries for User selection.', 'ultimate-member' )
+                            );
+
+        $settings_structure['']['sections']['account']['form_sections']['predefined_woo']['fields'][] = array(
+                                'id'             => 'um_custom_predefined_woo_directory',
+                                'type'           => 'checkbox',
+                                'label'          => $prefix . esc_html__( 'Members Directory Labels', 'ultimate-member' ),
+                                'checkbox_label' => esc_html__( "Click to activate Profile form custom Labels for the Woo fields in the Members Directory.", 'ultimate-member' ),
                             );
 
         return $settings_structure;
@@ -332,9 +478,13 @@ class UM_WOO_Predefined_Fields {
 
         return $states;
     }
+
+
 }
 
 new UM_WOO_Predefined_Fields();
+
+
 
     function um_get_field_woo_countries_dropdown() {
 
