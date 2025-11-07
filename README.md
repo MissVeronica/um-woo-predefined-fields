@@ -64,6 +64,7 @@ Woo Account Endpoints https://github.com/MissVeronica/um-woo-account-endpoints
 * Titles, Labels and some Placeholders updated from WooCommerce source code incl language translations if required.
 * Members Directory user selectable either Profile Form custom Labels or WooCommerce Labels.
 * Some code and security improvements
+* Tested withh Woo Version 10.3.4
 
 ## Installation and Updates
 * Install and update by downloading the plugin ZIP file via the green "Code" button
