@@ -1,4 +1,4 @@
-# Ultimate Member - Woo Predefined Fields
+# Ultimate Member - Woo Predefined Fields -  2.6.0
 Extension to Ultimate Member for using Woo Fields in the UM Forms Builder and User Account Page edit of Woo fields.
 
 ## UM Settings -> General -> Account
